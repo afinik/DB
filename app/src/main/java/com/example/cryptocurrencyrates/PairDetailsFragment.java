@@ -31,25 +31,25 @@ public class PairDetailsFragment extends Fragment {
         final EditText editLow = v.findViewById(R.id.editLow);
         final EditText editVolume = v.findViewById(R.id.editVolume);
         final EditText editLast = v.findViewById(R.id.editLast);
-        ((MainActivity)getActivity()).priceHigh.observe(PairDetailsFragment.this, new Observer<String>() {
+        ((MainActivity)getActivity()).mainViewModule.priceHigh.observe(PairDetailsFragment.this, new Observer<String>() {
             @Override
             public void onChanged(String s) {
                 editHigh.setText(s);
             }
         });
-        ((MainActivity)getActivity()).priceLow.observe(PairDetailsFragment.this, new Observer<String>() {
+        ((MainActivity)getActivity()).mainViewModule.priceLow.observe(PairDetailsFragment.this, new Observer<String>() {
             @Override
             public void onChanged(String s) {
                 editLow.setText(s);
             }
         });
-        ((MainActivity)getActivity()).priceVolume.observe(PairDetailsFragment.this, new Observer<String>() {
+        ((MainActivity)getActivity()).mainViewModule.priceVolume.observe(PairDetailsFragment.this, new Observer<String>() {
             @Override
             public void onChanged(String s) {
                 editVolume.setText(s);
             }
         });
-        ((MainActivity)getActivity()).priceLast.observe(PairDetailsFragment.this, new Observer<String>() {
+        ((MainActivity)getActivity()).mainViewModule.priceLast.observe(PairDetailsFragment.this, new Observer<String>() {
             @Override
             public void onChanged(String s) {
                 editLast.setText(s);

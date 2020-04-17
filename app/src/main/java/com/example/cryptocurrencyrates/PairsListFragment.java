@@ -33,20 +33,20 @@ public class PairsListFragment extends Fragment {
                 int id = radioGroup.getCheckedRadioButtonId();
                 switch (id) {
                     case R.id.ETHADX:
-                        Log.d("CURRENCY","ETHADX");
-                        ((MainActivity)getActivity()).downloadData("ETH-ADX");
+                        Log.e("CURRENCY","ETHADX");
+                        ((MainActivity)getActivity()).downloadData(CurrencyPairs.ETHADX.getCode());
                         break;
                     case R.id.USDTOMG:
-                        ((MainActivity)getActivity()).downloadData("USDT-OMG");
-                        Log.d("CURRENCY","USDTOMG");
+                        ((MainActivity)getActivity()).downloadData(CurrencyPairs.USDTOMG.getCode());
+                        Log.e("CURRENCY","USDTOMG");
                         break;
                     case R.id.BTCDGB:
-                        ((MainActivity)getActivity()).downloadData("BTC-DGB");
-                        Log.d("CURRENCY","BTCDGB");
+                        ((MainActivity)getActivity()).downloadData(CurrencyPairs.BTCDGB.getCode());
+                        Log.e("CURRENCY","BTCDGB");
                         break;
                     case R.id.USDUSDS:
-                        ((MainActivity)getActivity()).downloadData("USD-USDS");
-                        Log.d("CURRENCY","USDUSDS");
+                        ((MainActivity)getActivity()).downloadData(CurrencyPairs.USDUSDS.getCode());
+                        Log.e("CURRENCY","USDUSDS");
                         break;
                     default:
                         break;

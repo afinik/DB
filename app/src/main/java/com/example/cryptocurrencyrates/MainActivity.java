@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.MutableLiveData;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.AsyncTask;
@@ -25,10 +26,13 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    MutableLiveData<String> priceHigh = new MutableLiveData<String>();
-    MutableLiveData<String> priceLow = new MutableLiveData<String>();
-    MutableLiveData<String> priceVolume = new MutableLiveData<String>();
-    MutableLiveData<String> priceLast = new MutableLiveData<String>();
+//    MutableLiveData<String> priceHigh = new MutableLiveData<String>();
+//    MutableLiveData<String> priceLow = new MutableLiveData<String>();
+//    MutableLiveData<String> priceVolume = new MutableLiveData<String>();
+//    MutableLiveData<String> priceLast = new MutableLiveData<String>();
+
+
+    MainViewModule mainViewModule = new MainViewModule(getApplication());
 
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
@@ -40,13 +44,30 @@ public class MainActivity extends AppCompatActivity {
 
     void downloadData(String pairId) {
         new MyAsync(this).execute(pairId);
+        Log.e("success is ", String.valueOf(MyAsync.success));
+        if (MyAsync.success){
+            //TODO here we add smth to the Database
+            try {
+                mainViewModule.addCurrencyRates(MyAsync.jsonArray);
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Log.e("error", "Ошибка записи в Базу Данных. Запись не осуществлена.");
+            }
+        }
+        else {
+            //TODO присваиваем предыдущее значение из БД
+
+        }
     }
 
     static class MyAsync extends AsyncTask<String, Integer, ArrayList<Double>> {
 
-        WeakReference<MainActivity> mainActivityWeakReference;
 
-        public MyAsync(MainActivity activity) {
+        WeakReference<MainActivity> mainActivityWeakReference;
+        static boolean success;
+        static JSONArray jsonArray;
+
+        public   MyAsync(MainActivity activity) {
             mainActivityWeakReference = new WeakReference<>(activity);
         }
 
@@ -57,11 +78,15 @@ public class MainActivity extends AppCompatActivity {
                 final String s = getData("https://api.bittrex.com/api/v1.1/public/getmarketsummary?market=" + strings[0]);
                 Log.d("CRYPTO_CURRENCY_LOAD","JSON:" + s);
                 JSONObject jsonObject = new JSONObject(s);
-                boolean success = jsonObject.getBoolean("success");
+                success = jsonObject.getBoolean("success");
                 if (success) {
+                    Log.e("Операция", "Одобрена - " + String.valueOf(success));
                     JSONArray jsonArray = jsonObject.getJSONArray("result");
-                    for(int i = 0; i < jsonArray.length(); ++i) {
+//                    for(int i = 0; i < jsonArray.length(); ++i) {
+                    int i = 0;
+                    for (CurrencyPairs curr : CurrencyPairs.values()) {
                         JSONObject pair = jsonArray.getJSONObject(i);
+                        String pairCurrency = curr.getCode();
                         double high = pair.getDouble("High");
                         double low = pair.getDouble("Low");
                         double volume = pair.getDouble("Volume");
@@ -70,14 +95,17 @@ public class MainActivity extends AppCompatActivity {
                         result.add(low);
                         result.add(volume);
                         result.add(last);
+                        i++;
                     }
                 } else {
                     Log.d("CRYPTO_CURRENCY_LOAD","UNKNOWN ERROR");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+//                success = false;
             } catch (JSONException e) {
                 e.printStackTrace();
+//                success = false;
             }
             return result;
         }
@@ -87,11 +115,11 @@ public class MainActivity extends AppCompatActivity {
             super.onPostExecute(result);
             MainActivity activity = mainActivityWeakReference.get();
             if(activity != null && !activity.isFinishing()) {
-                if(activity.priceHigh != null) {
-                    activity.priceHigh.setValue(result.get(0).toString());
-                    activity.priceLow.setValue(result.get(1).toString());
-                    activity.priceVolume.setValue(result.get(2).toString());
-                    activity.priceLast.setValue(result.get(3).toString());
+                if(activity.mainViewModule.priceHigh != null) {
+                    activity.mainViewModule.priceHigh.setValue(result.get(0).toString());
+                    activity.mainViewModule.priceLow.setValue(result.get(1).toString());
+                    activity.mainViewModule.priceVolume.setValue(result.get(2).toString());
+                    activity.mainViewModule.priceLast.setValue(result.get(3).toString());
                 }
             }
         }
